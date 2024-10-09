@@ -1,6 +1,6 @@
-import { StreamLanguage, LanguageSupport } from "@codemirror/language";
-import { tags as t } from "@lezer/highlight";
-import { joyoKanji } from "./data";
+import { StreamLanguage, LanguageSupport } from '@codemirror/language';
+import { tags as t } from '@lezer/highlight';
+import { joyoKanji } from './data';
 
 const joyoKanjiSet = new Set(joyoKanji);
 
@@ -10,13 +10,18 @@ const kanjiAndFluctTokenizer = (fluctSet: Set<string>) => (stream: any) => {
   for (const fluct of fluctSet) {
     if (stream.match(fluct, false)) {
       stream.pos += fluct.length;
-      return "fluct";
+      return 'fluct';
     }
   }
 
   const char = stream.next();
-  if (char && /[\u4E00-\u9FFF]/.test(char)) {
-    return joyoKanjiSet.has(char) ? "joyo" : "non-joyo";
+  if (
+    char &&
+    /[\u{4E00}-\u{9FFF}\u{3400}-\u{4DBF}\u{20000}-\u{2A6DF}\u{2A700}-\u{2B73F}\u{2B740}-\u{2B81F}\u{2B820}-\u{2CEAF}\u{2CEB0}-\u{2EBEF}\u{30000}-\u{3134F}\u{F900}-\u{FAFF}]/u.test(
+      char
+    )
+  ) {
+    return joyoKanjiSet.has(char) ? 'joyo' : 'non-joyo';
   }
 
   stream.pos = start + 1;
@@ -29,7 +34,7 @@ const kanjiLanguage = (fluctSet: Set<string>) =>
     tokenTable: {
       fluct: t.emphasis,
       joyo: t.keyword,
-      "non-joyo": t.invalid,
+      'non-joyo': t.invalid,
     },
   });
 
